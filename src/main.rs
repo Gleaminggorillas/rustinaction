@@ -15,7 +15,7 @@ static ALLOCATOR: ReportingAllocator = ReportingAllocator;
 struct ReportingAllocator;
 
 unsafe impl GlobalAlloc for ReportingAllocator {
-    unsafe fn alloc(&self, layout; Layout) -> *mut u8 {
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let start = Instant::now();
         let ptr = System.alloc(layout);
         let end = Instant::now();
@@ -23,6 +23,7 @@ unsafe impl GlobalAlloc for ReportingAllocator {
         let bytes_requested = layout.size();
 
         eprintln!("{}\t{}", bytes_requested, time_taken.as_nanos());
+        ptr
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
@@ -44,7 +45,7 @@ struct Particle {
     position: Vec2d<f64>,
     velocity: Vec2d<f64>,
     acceleration: Vec2d<f64>,
-    color: [f32: 4],
+    color: [f32; 4],
 }
 
 impl Particle {
@@ -61,7 +62,8 @@ impl Particle {
             height: 4.0,
             width: 4.0,
             position: [x, y].into(),
-            velocity: [x_acceleration,
+            velocity: [x_velocity, y_velocity].into(),
+            acceleration: [x_acceleration,
                        y_acceleration].into(),
             color: [1.0, 1.0, 1.0, 0.99],
         }
@@ -149,7 +151,7 @@ fn main() {
         world.update();
 
         window.draw_2d(&event, |ctx, renderer, _device| {
-            clear([0.15, 0.17, 0.9], renderer);
+            clear([0.15, 0.17, 0.17, 0.9], renderer);
 
             for s in &mut world.particles {
                 let size = [s.position[0], s.position[1], s.width, s.height];
